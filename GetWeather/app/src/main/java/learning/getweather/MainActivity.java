@@ -67,12 +67,13 @@ public class MainActivity extends AppCompatActivity {
     // Should I use the normal "Thread" class rather than using "AsyncTask" ?
     private class WeatherChecker extends AsyncTask<String, Double, Void> {
         private static final String TAG = "WeatherChecker";
+
         @Override
         protected Void doInBackground(String... params) {
             try {
                 URL url = new URL(params[0]);
                 HttpURLConnection request = (HttpURLConnection) url.openConnection();
-                for (;;) {
+                for (; ; ) {
                     request.connect();
                     JsonReader jsonReader = new JsonReader(new InputStreamReader((InputStream) request.getContent()));
                     jsonReader.beginObject();
