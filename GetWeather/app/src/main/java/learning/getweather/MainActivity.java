@@ -1,10 +1,13 @@
 package learning.getweather;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.JsonReader;
 import android.util.JsonToken;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.io.InputStream;
@@ -16,7 +19,12 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
 
     private static final String KHARKOV_URL = "http://api.openweathermap.org/data/2.5/weather?q=kharkov&appid=9bfc7fdacca9e381d7c6d6dcfcb2d635";
+    private static final String PREV_TEMP = "previous_temperature";
     private static final double TEMP_DIFF = 273.15;
+    public static final String SADNESS = ":(";
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor sharedPreferencesEditor;
 
     private TextView weatherText;
 
@@ -25,63 +33,73 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        sharedPreferences = getPreferences(MODE_PRIVATE);
+        sharedPreferencesEditor = sharedPreferences.edit();
         weatherText = (TextView) findViewById(R.id.tv1);
 
         assert weatherText != null;
         try {
-            weatherText.setText(getData());
+            setTemperature(getData());
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     private String getData() throws ExecutionException, InterruptedException {
-        AsyncTask<String, Void, Double> weatherChecker = new WeatherChecker().execute(KHARKOV_URL);
-        return "100"; //// TODO: 7/28/2016 implement previous temp pick
+        new WeatherChecker().execute(KHARKOV_URL);
+        return sharedPreferences.getString(PREV_TEMP, SADNESS);
     }
 
-    private String conversionToCelsius(Double kelvinValue){
+    @NonNull
+    private String conversionToCelsius(Double kelvinValue) {
         double celsiusValue = kelvinValue - TEMP_DIFF;
         return String.valueOf(celsiusValue);
     }
 
-    private void setTemperature(String value){
-        weatherText.setText(value);
+    private void setTemperature(String value) {
+        if (!weatherText.getText().equals(value)) {
+            sharedPreferencesEditor.putString(PREV_TEMP, value);
+            sharedPreferencesEditor.apply();
+            weatherText.setText(value);
+        }
     }
 
-    private class WeatherChecker extends AsyncTask<String, Void, Double > {
-
+    // Should I use the normal "Thread" class rather than using "AsyncTask" ?
+    private class WeatherChecker extends AsyncTask<String, Double, Void> {
+        private static final String TAG = "WeatherChecker";
         @Override
-        protected Double doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             try {
                 URL url = new URL(params[0]);
                 HttpURLConnection request = (HttpURLConnection) url.openConnection();
-                request.connect();
-
-                JsonReader jsonReader = new JsonReader(new InputStreamReader((InputStream) request.getContent()));
-                jsonReader.beginObject();
-                Thread.sleep(20000);
-                for(;;){
-                    if(jsonReader.peek() != JsonToken.NAME || !jsonReader.nextName().equals("main")){
-                        jsonReader.skipValue();
-                        continue;
-                    }
+                for (;;) {
+                    request.connect();
+                    JsonReader jsonReader = new JsonReader(new InputStreamReader((InputStream) request.getContent()));
                     jsonReader.beginObject();
-                    jsonReader.nextName();
-                    break;
+                    Thread.sleep(60000);
+                    for (; ; ) {
+                        if (jsonReader.peek() != JsonToken.NAME || !jsonReader.nextName().equals("main")) {
+                            jsonReader.skipValue();
+                            continue;
+                        }
+                        jsonReader.beginObject();
+                        jsonReader.nextName();
+                        break;
+                    }
+                    publishProgress(jsonReader.nextDouble());
+                    request.disconnect();
                 }
-                return jsonReader.nextDouble();
-            } catch (Exception e){
-                //// TODO: 7/28/2016 implemenet
-                return null;
+            } catch (Exception e) {
+                Log.e(TAG, "WeatherChecker failed", e);
             }
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Double result) {
-            super.onPostExecute(result);
-            if(result != null) {
-                setTemperature(conversionToCelsius(result));
+        protected void onProgressUpdate(Double... values) {
+            super.onProgressUpdate(values);
+            if (values[0] != null) {
+                setTemperature(conversionToCelsius(values[0]));
             }
         }
     }
