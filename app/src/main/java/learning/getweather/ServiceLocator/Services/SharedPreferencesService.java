@@ -20,7 +20,7 @@ public class SharedPreferencesService extends DataService<String> {
     }
 
     @Override
-    protected void saveValue(String value) {
+    protected void saveValue(final String value) {
         sharedPreferencesEditor.putString(PREV_TEMP, value);
         sharedPreferencesEditor.apply();
     }

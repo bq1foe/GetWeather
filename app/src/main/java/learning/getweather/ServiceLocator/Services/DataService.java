@@ -12,7 +12,7 @@ public abstract class DataService<T> {
         return value;
     }
 
-    public void setValue(T value) {
+    public void setValue(final T value) {
         saveValue(value);
         this.value = value;
     }

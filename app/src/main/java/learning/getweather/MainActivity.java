@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         weatherText = (TextView) findViewById(R.id.tv1);
@@ -52,12 +52,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private String conversionToCelsius(Double kelvinValue) {
-        double celsiusValue = kelvinValue - TEMP_DIFF;
+    private String conversionToCelsius(final Double kelvinValue) {
+        final double celsiusValue = kelvinValue - TEMP_DIFF;
         return String.valueOf(celsiusValue);
     }
 
-    private void setTemperature(String value) {
+    private void setTemperature(final String value) {
         if (!weatherText.getText().equals(value)) {
             ServiceLocator.getService(SharedPreferencesService.SERVICE_ID).setValue(value);
             weatherText.setText(value);
@@ -68,13 +68,13 @@ public class MainActivity extends AppCompatActivity {
         private static final String TAG = "WeatherChecker";
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(final String... params) {
             try {
-                URL url = new URL(params[0]);
-                HttpURLConnection request = (HttpURLConnection) url.openConnection();
+                final URL url = new URL(params[0]);
+                final HttpURLConnection request = (HttpURLConnection) url.openConnection();
                 for (;;) {
                     request.connect();
-                    JsonReader jsonReader = new JsonReader(new InputStreamReader((InputStream) request.getContent()));
+                    final JsonReader jsonReader = new JsonReader(new InputStreamReader((InputStream) request.getContent()));
                     jsonReader.beginObject();
                     Thread.sleep(60000);
                     for (; ; ) {
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onProgressUpdate(Double... values) {
+        protected void onProgressUpdate(final Double... values) {
             super.onProgressUpdate(values);
             if (values[0] != null) {
                 setTemperature(conversionToCelsius(values[0]));
