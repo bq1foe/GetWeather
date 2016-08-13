@@ -1,6 +1,5 @@
 package learning.getweather;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,28 +15,30 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
+import learning.getweather.ServiceLocator.ServiceLocator;
+import learning.getweather.ServiceLocator.Services.SharedPreferencesService;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String KHARKOV_URL = "http://api.openweathermap.org/data/2.5/weather?q=kharkov&appid=9bfc7fdacca9e381d7c6d6dcfcb2d635";
-    private static final String PREV_TEMP = "previous_temperature";
     private static final double TEMP_DIFF = 273.15;
-    public static final String SADNESS = ":(";
-
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor sharedPreferencesEditor;
-
+    private static MainActivity instance;
     private TextView weatherText;
+
+    public MainActivity() {
+        instance = this;
+    }
+
+    public static MainActivity getContext() {
+        return instance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        sharedPreferences = getPreferences(MODE_PRIVATE);
-        sharedPreferencesEditor = sharedPreferences.edit();
         weatherText = (TextView) findViewById(R.id.tv1);
 
-        assert weatherText != null;
         try {
             setTemperature(getData());
         } catch (ExecutionException | InterruptedException e) {
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String getData() throws ExecutionException, InterruptedException {
         new WeatherChecker().execute(KHARKOV_URL);
-        return sharedPreferences.getString(PREV_TEMP, SADNESS);
+        return (String) ServiceLocator.getService(SharedPreferencesService.SERVICE_ID).getValue();
     }
 
     @NonNull
@@ -58,13 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void setTemperature(String value) {
         if (!weatherText.getText().equals(value)) {
-            sharedPreferencesEditor.putString(PREV_TEMP, value);
-            sharedPreferencesEditor.apply();
+            ServiceLocator.getService(SharedPreferencesService.SERVICE_ID).setValue(value);
             weatherText.setText(value);
         }
     }
 
-    // Should I use the normal "Thread" class rather than using "AsyncTask" ?
     private class WeatherChecker extends AsyncTask<String, Double, Void> {
         private static final String TAG = "WeatherChecker";
 
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 URL url = new URL(params[0]);
                 HttpURLConnection request = (HttpURLConnection) url.openConnection();
-                for (; ; ) {
+                for (;;) {
                     request.connect();
                     JsonReader jsonReader = new JsonReader(new InputStreamReader((InputStream) request.getContent()));
                     jsonReader.beginObject();
