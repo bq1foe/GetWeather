@@ -14,11 +14,11 @@ public class ServiceFactory {
         availableServices.put(SharedPreferencesService.SERVICE_ID, SharedPreferencesService.class);
     }
 
-    public DataService getService(final String name) {
+    public DataService getService(String name) {
         return cachedServices.containsKey(name) ? cachedServices.get(name) : createDataService(name);
     }
 
-    private DataService createDataService(final String name) {
+    private DataService createDataService(String name) {
         if (!availableServices.containsKey(name)) {
             return null;
         }

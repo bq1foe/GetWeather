@@ -3,14 +3,14 @@ package learning.getweather.ServiceLocator.Services;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import learning.getweather.MainActivity;
+import learning.getweather.App;
 
 public class SharedPreferencesService extends DataService<String> {
     public static final String SERVICE_ID = "SharedPreferencesService";
     private static final String PREV_TEMP = "previous_temperature";
     private static final String SADNESS = ":(";
 
-    private final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.getContext());
+    private final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
     private final SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
 
 
@@ -20,7 +20,7 @@ public class SharedPreferencesService extends DataService<String> {
     }
 
     @Override
-    protected void saveValue(final String value) {
+    protected void saveValue(String value) {
         sharedPreferencesEditor.putString(PREV_TEMP, value);
         sharedPreferencesEditor.apply();
     }
