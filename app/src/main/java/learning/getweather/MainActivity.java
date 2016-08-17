@@ -16,11 +16,11 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 import learning.getweather.ServiceLocator.Services.SharedPreferencesService;
+import learning.getweather.Utils.TemperatureUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String KHARKOV_URL = "http://api.openweathermap.org/data/2.5/weather?q=kharkov&appid=9bfc7fdacca9e381d7c6d6dcfcb2d635";
-    private static final double TEMP_DIFF = 273.15;
     private TextView weatherText;
 
     @Override
@@ -41,12 +41,6 @@ public class MainActivity extends AppCompatActivity {
         return (String) App.getService(SharedPreferencesService.SERVICE_ID).getValue();
     }
 
-    @NonNull
-    private String conversionToCelsius(Double kelvinValue) {
-        final double celsiusValue = kelvinValue - TEMP_DIFF;
-        return String.valueOf(celsiusValue);
-    }
-
     private void setTemperature(String value) {
         if (!weatherText.getText().equals(value)) {
             App.getService(SharedPreferencesService.SERVICE_ID).setValue(value);
@@ -62,15 +56,12 @@ public class MainActivity extends AppCompatActivity {
             try {
                 final URL url = new URL(params[0]);
                 final HttpURLConnection request = (HttpURLConnection) url.openConnection();
-//                Gson gson = new Gson();
 
-                for (; ; ) {
+                for (;;) {
                     request.connect();
-//                    gson.fromJson(new InputStreamReader((InputStream) request.getContent()));
                     final JsonReader jsonReader = new JsonReader(new InputStreamReader((InputStream) request.getContent()));
                     jsonReader.beginObject();
-                    Thread.sleep(60000);
-                    for (; ; ) {
+                    for (;;) {
                         if (jsonReader.peek() != JsonToken.NAME || !jsonReader.nextName().equals("main")) {
                             jsonReader.skipValue();
                             continue;
@@ -92,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(Double... values) {
             super.onProgressUpdate(values);
             if (values[0] != null) {
-                setTemperature(conversionToCelsius(values[0]));
+                setTemperature(TemperatureUtil.convertKelvinToCelsius(values[0]));
             }
         }
     }
