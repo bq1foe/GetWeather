@@ -1,4 +1,4 @@
-package learning.getweather.ServiceLocator.Services;
+package learning.getweather.serviceLocator.Services;
 
 public abstract class DataService<T> {
     private T value;

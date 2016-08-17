@@ -1,31 +1,33 @@
-package learning.getweather.ServiceLocator;
+package learning.getweather.serviceLocator;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import learning.getweather.ServiceLocator.Services.DataService;
-import learning.getweather.ServiceLocator.Services.SharedPreferencesService;
+import learning.getweather.serviceLocator.Services.DataService;
+import learning.getweather.serviceLocator.Services.SharedPreferencesService;
 
 public class ServiceFactory {
-    private final Map<String, Class> availableServices = new HashMap<>();
-    private final Map<String, DataService> cachedServices = new HashMap<>();
+    private final Set<Class> availableServices = new HashSet<>();
+    private final Map<Class, DataService> cachedServices = new HashMap<>();
 
     public ServiceFactory() {
-        availableServices.put(SharedPreferencesService.SERVICE_ID, SharedPreferencesService.class);
+        availableServices.add(SharedPreferencesService.class);
     }
 
-    public DataService getService(String name) {
-        return cachedServices.containsKey(name) ? cachedServices.get(name) : createDataService(name);
+    public DataService getService(Class className) {
+        return cachedServices.containsKey(className) ? cachedServices.get(className) : createDataService(className);
     }
 
-    private DataService createDataService(String name) {
-        if (!availableServices.containsKey(name)) {
+    private DataService createDataService(Class className) {
+        if (!availableServices.contains(className)) {
             return null;
         }
         DataService dataService = null;
         try {
-            dataService = (DataService) availableServices.get(name).newInstance();
-            cachedServices.put(name, dataService);
+            dataService = (DataService) className.newInstance();
+            cachedServices.put(className, dataService);
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

@@ -2,8 +2,8 @@ package learning.getweather;
 
 import android.app.Application;
 
-import learning.getweather.ServiceLocator.ServiceFactory;
-import learning.getweather.ServiceLocator.Services.DataService;
+import learning.getweather.serviceLocator.ServiceFactory;
+import learning.getweather.serviceLocator.Services.DataService;
 
 public class App extends Application {
     private static App instance;
@@ -18,7 +18,7 @@ public class App extends Application {
 
     private static final ServiceFactory serviceFactory = new ServiceFactory();
 
-    public static DataService getService(final String serviceName) {
-        return serviceFactory.getService(serviceName);
+    public static DataService getService(final Class className) {
+        return serviceFactory.getService(className);
     }
 }

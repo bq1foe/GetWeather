@@ -1,4 +1,4 @@
-package learning.getweather.Utils;
+package learning.getweather.utils;
 
 public class TemperatureUtil {
     private static final double TEMP_DIFF = 273.15;

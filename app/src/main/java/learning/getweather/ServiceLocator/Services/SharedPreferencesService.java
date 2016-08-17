@@ -1,4 +1,4 @@
-package learning.getweather.ServiceLocator.Services;
+package learning.getweather.serviceLocator.Services;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -6,7 +6,6 @@ import android.preference.PreferenceManager;
 import learning.getweather.App;
 
 public class SharedPreferencesService extends DataService<String> {
-    public static final String SERVICE_ID = "SharedPreferencesService";
     private static final String PREV_TEMP = "previous_temperature";
     private static final String SADNESS = ":(";
 

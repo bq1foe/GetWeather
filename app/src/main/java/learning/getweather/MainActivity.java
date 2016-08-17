@@ -2,7 +2,6 @@ package learning.getweather;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -15,11 +14,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-import learning.getweather.ServiceLocator.Services.SharedPreferencesService;
-import learning.getweather.Utils.TemperatureUtil;
+import learning.getweather.serviceLocator.Services.DataService;
+import learning.getweather.serviceLocator.Services.SharedPreferencesService;
+import learning.getweather.utils.TemperatureUtil;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final DataService sharedPrefService = App.getService(SharedPreferencesService.class);
     private static final String KHARKOV_URL = "http://api.openweathermap.org/data/2.5/weather?q=kharkov&appid=9bfc7fdacca9e381d7c6d6dcfcb2d635";
     private TextView weatherText;
 
@@ -38,12 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
     private String getData() throws ExecutionException, InterruptedException {
         new WeatherChecker().execute(KHARKOV_URL);
-        return (String) App.getService(SharedPreferencesService.SERVICE_ID).getValue();
+        return (String) sharedPrefService.getValue();
     }
 
     private void setTemperature(String value) {
         if (!weatherText.getText().equals(value)) {
-            App.getService(SharedPreferencesService.SERVICE_ID).setValue(value);
+            sharedPrefService.setValue(value);
             weatherText.setText(value);
         }
     }
