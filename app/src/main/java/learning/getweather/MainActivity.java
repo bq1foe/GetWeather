@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
 import java.util.concurrent.ExecutionException;
 
 import learning.getweather.openweather.entities.ResponseEntity;
@@ -38,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getData() throws ExecutionException, InterruptedException {
-//        new WeatherChecker().execute(KHARKOV_URL);
         final Call<ResponseEntity> call = remoteService.getCurrentWeather(CITY, API_KEY);
         call.enqueue(new Callback<ResponseEntity>() {
             @Override

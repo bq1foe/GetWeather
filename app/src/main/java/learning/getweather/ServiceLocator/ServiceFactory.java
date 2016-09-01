@@ -33,7 +33,6 @@ public class ServiceFactory {
             return null;
         } else if (className.equals(API.class)) {
             final Gson gson = new GsonBuilder()
-//                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
                     .create();
 
             final Retrofit retrofit = new Retrofit.Builder()
