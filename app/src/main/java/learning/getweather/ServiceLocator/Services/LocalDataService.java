@@ -1,6 +1,6 @@
 package learning.getweather.serviceLocator.Services;
 
-public abstract class DataService<T> {
+public abstract class LocalDataService<T> {
     private T value;
 
     public T getValue() {

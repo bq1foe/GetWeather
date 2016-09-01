@@ -5,7 +5,7 @@ import android.preference.PreferenceManager;
 
 import learning.getweather.App;
 
-public class SharedPreferencesService extends DataService<String> {
+public class SharedPreferencesService extends LocalDataService<String> {
     private static final String PREV_TEMP = "previous_temperature";
     private static final String SADNESS = ":(";
 
